@@ -14,7 +14,7 @@ class Impl {
   Impl(size_type maxmem,
       float max_load_factor,
       Evictor* evictor,
-      hash_func hasher) maxmem(maxmem), max_load_factor(max_load_factor), evictor(evictor), hasher(hasher)
+      hash_func hasher) : maxmem(maxmem), max_load_factor(max_load_factor), evictor(evictor), hasher(hasher)
       {}
 
   ~Impl() = default;
