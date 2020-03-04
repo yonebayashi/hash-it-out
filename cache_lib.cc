@@ -41,8 +41,12 @@ class Cache::Impl {
       if (memused + size > maxmem) {
         while (memused + size > maxmem) {
           auto item = m_cache.begin();
-          del(item->first);
-          memused -= sizeof(item->second);
+          if (del(item->first)) {
+            // get(item->first);
+            memused -= strlen(item->second)+1;  // evict old values in cache to make enough space for new ones
+          } else {
+            break;  // no more cache items to evict; stop accepting new values
+          };
         }
       }
       m_cache[key] = val;
@@ -50,11 +54,23 @@ class Cache::Impl {
       return;
     }
 
-    val_type get(key_type key, size_type& val_size) const {};
+    val_type get(key_type key, size_type& val_size) const {
+      auto item = m_cache.find(key);
+      if (key != m_cache.end()->first && item == m_cache.end()) {
+        std::cout << "Item not found" << std::endl;
+        return nullptr;
+      }
+      val_size = strlen(item->second)+1;
+      return item->second;
+    };
 
-    bool del(key_type key) {};
+    bool del(key_type key) {
+      return m_cache.erase(key) == 1 ? true : false;
+    };
 
-    size_type space_used() const {};
+    size_type space_used() const {
+      return memused;
+    };
 
     void reset() {};
 };
