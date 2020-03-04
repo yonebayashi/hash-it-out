@@ -25,29 +25,32 @@ class Cache::Impl {
     hash_func hasher;
 
     unordered_map<key_type, val_type, hash_func> m_cache;
-    byte_type memused;
+    size_type memused;
 
     Impl(size_type maxmem,
         float max_load_factor,
         Evictor* evictor,
         hash_func hasher) : maxmem(maxmem), max_load_factor(max_load_factor), evictor(evictor), hasher(hasher),
                             memused(0), m_cache(0, hasher)
-        {}
+      {
+
+
+
+      }
 
     ~Impl() = default;
 
     void set(key_type key, val_type val, size_type size)
     {
-      if (memused + size > maxmem) {
-        while (memused + size > maxmem) {
-          auto item = m_cache.begin();
-          if (del(item->first)) {
-            // get(item->first);
-            memused -= strlen(item->second)+1;  // evict old values in cache to make enough space for new ones
-          } else {
-            break;  // no more cache items to evict; stop accepting new values
-          };
-        }
+
+      while (memused + size > maxmem) {
+        auto item = m_cache.begin();
+        if (del(item->first)) {
+          // get(item->first);
+          memused -= strlen(item->second)+1;  // evict old values in cache to make enough space for new ones
+        } else {
+          break;  // no more cache items to evict; stop accepting new values
+        };
       }
       m_cache[key] = val;
       memused += size;
@@ -56,7 +59,7 @@ class Cache::Impl {
 
     val_type get(key_type key, size_type& val_size) const {
       auto item = m_cache.find(key);
-      if (key != m_cache.end()->first && item == m_cache.end()) {
+      if (item == m_cache.end()) {
         std::cout << "Item not found" << std::endl;
         return nullptr;
       }
