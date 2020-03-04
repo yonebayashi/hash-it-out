@@ -44,13 +44,17 @@ class Cache::Impl {
 
     void set(key_type key, val_type val, size_type size)
     {
-
+      bool accept_new_value; //boolean determining whether or not to accept the new value to the cache. 
+                              //added in to handle edge case of being asked to accept a value whose size exceeds maxmem
       while (memused + size > maxmem) {
+        //TO-DO: Body of this loop needs to change and be replaced with Evictor functionality
         auto item = m_cache.begin();
         if (del(item->first)) {
           // get(item->first);
           memused -= strlen(item->second)+1;  // evict old values in cache to make enough space for new ones
+          accept_new_value=true;
         } else {
+          accept_new_value=false;
           break;  // no more cache items to evict; stop accepting new values
         };
       }
