@@ -2,20 +2,22 @@
 
 #include "cache.hh"
 #include "evictor.hh"
-
+#include <cmath>
 using namespace std;
 
-/*
+
 // Implement Universal Hashing: https://en.wikipedia.org/wiki/Universal_hashing
-size_type std::hash<key_type>(key_type key, size_type a, size_type p)
+size_type std::hash<key_type>(key_type key, size_type p = 53, size_type m)
 {
-  size_type hash = 0;
-  for (size_type i=0; i< key.length(); ++i) {
-    hash = ((h*a) + key[i]) % p;
+  size_type key_as_unsigned= 0;
+  for (key_type::size_type i = 0; i < key.size(); i++) {
+    key_as_unsigned+=(((unsigned long long int )key[i])*std::pow(p, i)) %m;
+    key_as_unsigned= key_as_unsigned % m;
   }
-  return hash;
+
+  return std::floor(m* (k*A- std::floor(k*A) ) );
 }
-*/
+
 
 class Cache::Impl {
   public:
