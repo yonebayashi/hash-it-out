@@ -6,7 +6,7 @@
 using namespace std;
 
 
-// Implement Universal Hashing: https://en.wikipedia.org/wiki/Universal_hashing
+// Implement Rolling Hash: https://en.wikipedia.org/wiki/Rolling_hash#Rabin-Karp_rolling_hash
 size_type std::hash<key_type>(key_type key, size_type p = 53, size_type m)
 {
   size_type key_as_unsigned= 0;
@@ -35,21 +35,18 @@ class Cache::Impl {
         hash_func hasher) : maxmem(maxmem), max_load_factor(max_load_factor), evictor(evictor), hasher(hasher),
                             memused(0), m_cache(0, hasher)
       {
-
-
-
+        m_cache.max_load_factor(max_load_factor);
       }
 
     ~Impl() = default;
 
     void set(key_type key, val_type val, size_type size)
     {
-  
+
       while (memused + size > maxmem) {
         //TO-DO: Body of this loop needs to change and be replaced with Evictor functionality
         auto item = m_cache.begin();
         if (del(item->first)) {
-          // get(item->first);
           memused -= strlen(item->second)+1;  // evict old values in cache to make enough space for new ones
 
         } else {
@@ -66,7 +63,7 @@ class Cache::Impl {
       auto item = m_cache.find(key);
       if (item == m_cache.end()) {
         std::cout << "Item not found" << std::endl;
-        val_size=0; //Should this be 1?
+        val_size = 1;
         return nullptr;
       }
       val_size = strlen(item->second)+1;
@@ -81,7 +78,10 @@ class Cache::Impl {
       return memused;
     };
 
-    void reset() {};
+    void reset() {
+      m_cache.clear();
+      memused = 0;
+    };
 };
 
 Cache::Cache(size_type maxmem,
