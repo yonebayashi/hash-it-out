@@ -43,20 +43,23 @@ class Cache::Impl {
 
     void set(key_type key, val_type val, size_type size)
     {
+      //TODO: Not copying the data from the pointer val. We need to fix this.
+      if (size>maxmem) {
+        return;
+      }
+      if (memused + size >maxmem and evictor==nullptr) {
+        return;
+      }
+
+
 
       while (memused + size > maxmem) {
-        //TO-DO: Body of this loop needs to change and be replaced with Evictor functionality
-        auto item = m_cache.begin();
-        if (del(item->first)) {
-          memused -= strlen(item->second)+1;  // evict old values in cache to make enough space for new ones
-
-        } else {
-
-          break;  // no more cache items to evict; stop accepting new values
-        };
+        auto key_to_evict = evictor->evict();
+        del(key);
       }
       m_cache[key] = val;
       memused += size;
+      evictor->touch_key(key);
       return;
     }
 
@@ -64,15 +67,24 @@ class Cache::Impl {
       auto item = m_cache.find(key);
       if (item == m_cache.end()) {
         std::cout << "Item not found" << std::endl;
-        val_size = 1;
+        val_size = 0;
         return nullptr;
       }
       val_size = strlen(item->second)+1;
+      evictor->touch_key(key);
       return item->second;
     };
 
     bool del(key_type key) {
-      return m_cache.erase(key) == 1 ? true : false;
+      size_type size =0;
+      get(key, size);
+      if (size>0) {
+        m_cache.erase(key);
+        memused-= size;
+        return true;
+      } else {
+        return false;
+      }
     };
 
     size_type space_used() const {
@@ -83,6 +95,15 @@ class Cache::Impl {
       m_cache.clear();
       memused = 0;
     };
+    /*
+    key_type key_to_evict() {
+      if (evictor!= nullptr) {
+        return evictor->evict();
+      } else {
+        return "";
+      }
+    }
+    */
 };
 
 Cache::Cache(size_type maxmem,
