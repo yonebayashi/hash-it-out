@@ -3,11 +3,12 @@
 #include "cache.hh"
 #include "evictor.hh"
 #include <cmath>
-using namespace std;
+#include <iostream>
+#include <cstring>
 
 
 // Implement Rolling Hash: https://en.wikipedia.org/wiki/Rolling_hash#Rabin-Karp_rolling_hash
-Cache::size_type default_hash(const key_type &key, const Cache::size_type &m, const Cache::size_type p = 53)
+/*Cache::size_type default_hash(const key_type &key, const Cache::size_type &m, const Cache::size_type p = 53)
 {
   Cache::size_type key_as_unsigned= 0;
   for (Cache::size_type i = 0; i < key.size(); i++) {
@@ -17,7 +18,7 @@ Cache::size_type default_hash(const key_type &key, const Cache::size_type &m, co
 
   return std::floor(m* (k*A- std::floor(k*A) ) );
 }
-
+*/
 
 class Cache::Impl {
   public:
@@ -26,37 +27,50 @@ class Cache::Impl {
     Evictor* evictor;
     hash_func hasher;
 
-    unordered_map<key_type, val_type, hash_func> m_cache;
+    std::unordered_map<key_type, val_type, hash_func> m_cache;
     size_type memused;
 
     Impl(size_type maxmem,
         float max_load_factor,
         Evictor* evictor,
-        hash_func hasher = default_hash()) :
+        hash_func hasher = std::hash<key_type>()) :
                             maxmem(maxmem), max_load_factor(max_load_factor), evictor(evictor), hasher(hasher),
                             memused(0), m_cache(0, hasher)
       {
         m_cache.max_load_factor(max_load_factor);
       }
 
-    ~Impl() = default;
+    ~Impl() {
+      for (auto it=m_cache.begin(); it!= m_cache.end(); ++it) {
+        del(m_cache[it->first]);
+      }
+      if (evictor!= nullptr) {
+        delete evictor;
+      }
+
+    }
 
     void set(key_type key, val_type val, size_type size)
     {
-
-      while (memused + size > maxmem) {
-        //TO-DO: Body of this loop needs to change and be replaced with Evictor functionality
-        auto item = m_cache.begin();
-        if (del(item->first)) {
-          memused -= strlen(item->second)+1;  // evict old values in cache to make enough space for new ones
-
-        } else {
-
-          break;  // no more cache items to evict; stop accepting new values
-        };
+      if (size>maxmem) {
+        return;
       }
-      m_cache[key] = val;
-      memused += size;
+      if (memused + size >maxmem and evictor==nullptr) {
+        return;
+      }
+      while (memused + size > maxmem) {
+        auto key_to_evict = evictor->evict();
+        del(key);
+      }
+      if (m_cache.find(key)!= m_cache.end()) {
+        del(key);
+      }
+
+      val_type new_val;
+      std::memcpy(new_val, val, size+1);
+      m_cache[key] = new_val;
+      memused += size+1;
+      evictor->touch_key(key);
       return;
     }
 
@@ -64,15 +78,25 @@ class Cache::Impl {
       auto item = m_cache.find(key);
       if (item == m_cache.end()) {
         std::cout << "Item not found" << std::endl;
-        val_size = 1;
+        val_size = 0;
         return nullptr;
       }
-      val_size = strlen(item->second)+1;
+      val_size = strlen(item->second);
+      evictor->touch_key(key);
       return item->second;
     };
 
     bool del(key_type key) {
-      return m_cache.erase(key) == 1 ? true : false;
+      size_type size =0;
+      get(key, size);
+      if (size>0) {
+        delete[] m_cache[key];
+        m_cache.erase(key);
+        memused-= size+1;
+        return true;
+      } else {
+        return false;
+      }
     };
 
     size_type space_used() const {
@@ -83,6 +107,15 @@ class Cache::Impl {
       m_cache.clear();
       memused = 0;
     };
+    /*
+    key_type key_to_evict() {
+      if (evictor!= nullptr) {
+        return evictor->evict();
+      } else {
+        return "";
+      }
+    }
+    */
 };
 
 Cache::Cache(size_type maxmem,
