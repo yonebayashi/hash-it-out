@@ -17,4 +17,6 @@ public:
 
   void touch_key(const key_type& key); //Is it kosher to pass an argument here?
   const key_type evict();
+
+  void clear();
 };

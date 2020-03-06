@@ -7,9 +7,7 @@
 FifoEvictor::FifoEvictor(std::queue<key_type>& key_queue) : key_queue(key_queue) {}
 
 FifoEvictor::~FifoEvictor() {
-	while (!key_queue.empty()) {
-		key_queue.pop();
-	}
+	this->clear();
 }
 void FifoEvictor::touch_key(const key_type& key) {
 	key_queue.push(key);
@@ -25,3 +23,8 @@ const key_type FifoEvictor::evict()  {
   return evicted;
 }
 
+void FifoEvictor::clear() {
+	while (!key_queue.empt()) {
+		key_queue.pop();
+	}
+}
