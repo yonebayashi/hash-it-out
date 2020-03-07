@@ -7,7 +7,9 @@
 FifoEvictor::FifoEvictor() {}
 
 FifoEvictor::~FifoEvictor() {
-	this->clear();
+	while (!key_queue.empty()) {
+		key_queue.pop();
+	}
 }
 
 void FifoEvictor::touch_key(const key_type& key) {
