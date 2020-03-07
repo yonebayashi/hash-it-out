@@ -23,9 +23,3 @@ const key_type FifoEvictor::evict()  {
   key_queue.pop();
   return evicted;
 }
-
-void FifoEvictor::clear() {
-	while (!key_queue.empt()) {
-		key_queue.pop();
-	}
-}
