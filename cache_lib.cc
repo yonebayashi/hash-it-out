@@ -87,7 +87,9 @@ class Cache::Impl {
         return nullptr;
       }
       val_size = strlen(item->second)+1;
-      evictor->touch_key(key);
+      if (evictor!= nullptr) {
+        evictor->touch_key(key);
+      }
       return item->second;
     };
 
