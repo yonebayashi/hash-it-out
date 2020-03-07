@@ -70,7 +70,7 @@ class Cache::Impl {
 
       byte_type* new_val;
       //C-Syle Copying: std::memcpy(new_val, val, size);
-      std::copy(val, val + size, new_val)
+      std::copy(val, val + size, new_val);
       m_cache[key] = new_val;
       memused += size;
       evictor->touch_key(key);
@@ -112,7 +112,11 @@ class Cache::Impl {
       for (auto it=m_cache.begin(); it!= m_cache.end(); ++it) {
         del(it->first);
       }
-      while (!evictor.empty())
+      if (evictor!= nullptr) {
+        while (evictor-> evict()!= "") {
+          bool dummy = false; //Do I need this here?
+        }
+      }
       memused = 0;
     };
 
