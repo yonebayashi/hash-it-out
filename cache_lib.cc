@@ -73,7 +73,9 @@ class Cache::Impl {
       std::copy(val, val + size, new_val);
       m_cache[key] = new_val;
       memused += size;
-      evictor->touch_key(key);
+      if (evictor!= nullptr) {
+        evictor->touch_key(key);
+      }
       return;
     }
 
