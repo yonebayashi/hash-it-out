@@ -7,30 +7,18 @@
 #include <cstring>
 
 
-// Implement Rolling Hash: https://en.wikipedia.org/wiki/Rolling_hash#Rabin-Karp_rolling_hash
-/*Cache::size_type default_hash(const key_type &key, const Cache::size_type &m, const Cache::size_type p = 53)
-{
-  Cache::size_type key_as_unsigned= 0;
-  for (Cache::size_type i = 0; i < key.size(); i++) {
-    key_as_unsigned+=(((unsigned long int )key[i])*std::pow(p, i)) %m;
-    key_as_unsigned= key_as_unsigned % m;
+struct default_hash {
+  Cache::size_type operator()(key_type const& key) const {
+      const Cache::size_type p = 53;
+      unsigned long long int result= 0;
+      for (Cache::size_type i = 0; i < key.size(); i++) {
+        result+=((key[i])*(unsigned long long int) std::pow(p, i));
+      }
+      return result;
   }
+};
 
-  return std::floor(m* (k*A- std::floor(k*A) ) );
-}
-*/
 
-    // Implement Rolling Hash: https://en.wikipedia.org/wiki/Rolling_hash#Rabin-Karp_rolling_hash 
-  size_type default_hash(key_type key) {
-    const size_type p = 53;
-    const size_type m = m_cache.bucket_count();
-    size_type result= 0;
-    for (Cache::size_type i = 0; i < key.size(); i++) {
-      result+=((key[i])*(unsigned long int) std::pow(p, i)) % m;
-      result= result % m;
-    }
-    return result;
-  }
 class Cache::Impl {
   public:
     size_type maxmem;
@@ -44,7 +32,7 @@ class Cache::Impl {
     Impl(size_type maxmem,
         float max_load_factor,
         Evictor* evictor,
-        hash_func hasher = std::hash<key_type>()) :
+        hash_func hasher = default_hash()) :
                             maxmem(maxmem), max_load_factor(max_load_factor), evictor(evictor), hasher(hasher),
                             memused(0), m_cache(0, hasher)
       {
