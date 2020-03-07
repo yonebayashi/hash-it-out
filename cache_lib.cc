@@ -20,6 +20,17 @@
 }
 */
 
+    // Implement Rolling Hash: https://en.wikipedia.org/wiki/Rolling_hash#Rabin-Karp_rolling_hash 
+  size_type default_hash(key_type key) {
+    const size_type p = 53;
+    const size_type m = m_cache.bucket_count();
+    size_type result= 0;
+    for (Cache::size_type i = 0; i < key.size(); i++) {
+      result+=((key[i])*(unsigned long int) std::pow(p, i)) % m;
+      result= result % m;
+    }
+    return result;
+  }
 class Cache::Impl {
   public:
     size_type maxmem;
@@ -42,7 +53,7 @@ class Cache::Impl {
 
     ~Impl() {
       for (auto it=m_cache.begin(); it!= m_cache.end(); ++it) {
-        del(m_cache[it->first]);
+        del(it->first);
       }
       if (evictor!= nullptr) {
         delete evictor;
@@ -60,16 +71,20 @@ class Cache::Impl {
       }
       while (memused + size > maxmem) {
         auto key_to_evict = evictor->evict();
-        del(key);
+        del(key_to_evict);
       }
       if (m_cache.find(key)!= m_cache.end()) {
+        //If the key is already in the cache and we're updating the value,
+        //we want to free the memory pointed to by the pointer previously corresponding
+        //to key before losing track of its address.
         del(key);
       }
 
-      val_type new_val;
-      std::memcpy(new_val, val, size+1);
+      byte_type* new_val;
+      //C-Syle Copying: std::memcpy(new_val, val, size);
+      std::copy(val, val + size, new_val)
       m_cache[key] = new_val;
-      memused += size+1;
+      memused += size;
       evictor->touch_key(key);
       return;
     }
@@ -81,7 +96,7 @@ class Cache::Impl {
         val_size = 0;
         return nullptr;
       }
-      val_size = strlen(item->second);
+      val_size = strlen(item->second)+1;
       evictor->touch_key(key);
       return item->second;
     };
@@ -92,30 +107,28 @@ class Cache::Impl {
       if (size>0) {
         delete[] m_cache[key];
         m_cache.erase(key);
-        memused-= size+1;
+        memused-= size;
         return true;
       } else {
         return false;
       }
     };
 
+
+
     size_type space_used() const {
       return memused;
     };
 
     void reset() {
-      m_cache.clear();
+      for (auto it=m_cache.begin(); it!= m_cache.end(); ++it) {
+        del(it->first);
+      }
+      while (!evictor.empty())
       memused = 0;
     };
-    /*
-    key_type key_to_evict() {
-      if (evictor!= nullptr) {
-        return evictor->evict();
-      } else {
-        return "";
-      }
-    }
-    */
+
+
 };
 
 Cache::Cache(size_type maxmem,

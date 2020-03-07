@@ -17,4 +17,6 @@ public:
 
   void touch_key(const key_type&); 
   const key_type evict();
+
+  void clear();
 };
