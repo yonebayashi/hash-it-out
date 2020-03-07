@@ -8,7 +8,7 @@ private:
   std::queue<key_type> key_queue;
 
 public:
-  FifoEvictor(std::queue<key_type>& key_queue);
+  FifoEvictor();
   ~FifoEvictor() = default;
 
   // Disallow copies

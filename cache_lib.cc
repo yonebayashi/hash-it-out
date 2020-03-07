@@ -21,13 +21,13 @@
 */
 
     // Implement Rolling Hash: https://en.wikipedia.org/wiki/Rolling_hash#Rabin-Karp_rolling_hash 
-  size_type default_hash(key_type key) {
-    const size_type p = 53;
-    const size_type m = m_cache.bucket_count();
-    size_type result= 0;
-    for (Cache::size_type i = 0; i < key.size(); i++) {
-      result+=((key[i])*(unsigned long int) std::pow(p, i)) % m;
-      result= result % m;
+  unsigned long long int default_hash(key_type key) {
+    const unsigned long long int p = 53;
+    //const size_type m = m_cache.bucket_count();
+    unsigned long long int result= 0;
+    for (auto i = 0; i < key.size(); i++) {
+      result+=((key[i])*(unsigned long int) std::pow(p, i)) ;
+      //result= result % m;
     }
     return result;
   }
@@ -82,7 +82,7 @@ class Cache::Impl {
 
       byte_type* new_val;
       //C-Syle Copying: std::memcpy(new_val, val, size);
-      std::copy(val, val + size, new_val)
+      std::copy(val, val + size, new_val);
       m_cache[key] = new_val;
       memused += size;
       evictor->touch_key(key);
@@ -124,7 +124,11 @@ class Cache::Impl {
       for (auto it=m_cache.begin(); it!= m_cache.end(); ++it) {
         del(it->first);
       }
-      while (!evictor.empty())
+      if (evictor!= nullptr) {
+        while (evictor-> evict()!= "") {
+          bool dummy = false; //Do I need this here?
+        }
+      }
       memused = 0;
     };
 
