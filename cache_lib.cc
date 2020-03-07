@@ -68,7 +68,7 @@ class Cache::Impl {
         del(key);
       }
 
-      byte_type* new_val;
+      byte_type* new_val = new byte_type[size-1];
       //C-Syle Copying: std::memcpy(new_val, val, size);
       std::copy(val, val + size, new_val);
       m_cache[key] = new_val;
