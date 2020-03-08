@@ -13,7 +13,7 @@ void testCacheBasic() {
   FifoEvictor* evictor= new FifoEvictor();
   Cache basic_cache(8, 0.75, evictor);
 
-  const Cache::val_type val1 = "a";
+  const Cache::val_type val1 = "1";
   const Cache::val_type val2 = "2";
   const Cache::val_type val3 = "16";
   const Cache::val_type val4 = "17";
@@ -52,7 +52,7 @@ void testCacheBasic() {
   // cout << "Test get key 1 passed" << endl;
 
   cout << "Attempting to retrieve key 4 (not yet in cache)... " << endl;
-  basic_cache.get("k4", size);
+  assert(basic_cache.get("k4", size) == NULL);
   assert(size == 0);
   cout << "Test retrieve item not in cache passed" << endl;
 
