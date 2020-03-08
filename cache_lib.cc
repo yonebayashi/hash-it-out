@@ -83,7 +83,6 @@ class Cache::Impl {
     val_type get(key_type key, size_type& val_size) const {
       auto item = m_cache.find(key);
       if (item == m_cache.end()) {
-        // std::cout << "Item not found" << std::endl;
         val_size = 0;
         return nullptr;
       }
