@@ -8,6 +8,7 @@
 
 
 struct default_hash {
+  // Implement Rolling Hash: https://en.wikipedia.org/wiki/Rolling_hash#Rabin-Karp_rolling_hash
   Cache::size_type operator()(key_type const& key) const {
       const Cache::size_type p = 53;
       unsigned long long int result= 0;
@@ -82,7 +83,7 @@ class Cache::Impl {
     val_type get(key_type key, size_type& val_size) const {
       auto item = m_cache.find(key);
       if (item == m_cache.end()) {
-        std::cout << "Item not found" << std::endl;
+        // std::cout << "Item not found" << std::endl;
         val_size = 0;
         return nullptr;
       }
@@ -101,11 +102,9 @@ class Cache::Impl {
         m_cache.erase(key);
         memused-= size;
         return true;
-      } else {
-        return false;
       }
+      return false;
     };
-
 
 
     size_type space_used() const {
@@ -123,9 +122,8 @@ class Cache::Impl {
       }
       memused = 0;
     };
-
-
 };
+
 
 Cache::Cache(size_type maxmem,
       float max_load_factor,
