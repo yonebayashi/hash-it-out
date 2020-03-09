@@ -8,8 +8,22 @@
 
 using namespace std;
 
+void testCacheBasic_wo_Evictor() {
+  Cache cache(0, 0.75, nullptr);
+  const Cache::val_type val1 = "1";
+  Cache::size_type size;
+  cout << "Inserting key 1 of size " << strlen(val1)+1 << " bytes" << endl;
+  cache.set("k1", val1, strlen(val1)+1);
+  cout << "Attempting to retrieve key 1 (should not have been inserted)... " << endl;
+  assert(cache.get("k1", size) == NULL);
+  assert(size == 0);
+  cout << "Test passed for no-evictor memory overflow" << endl;
 
-void testCacheBasic() {
+
+
+}
+
+void testCacheBasic_w_Evictor() {
   FifoEvictor* evictor= new FifoEvictor();
   Cache basic_cache(8, 0.75, evictor);
 
@@ -109,6 +123,7 @@ void testCacheBasic() {
 }
 
 int main(int argc, char const *argv[]) {
-  testCacheBasic();
+  testCacheBasic_w_Evictor();
+  testCacheBasic_wo_Evictor();
   return 0;
 }
