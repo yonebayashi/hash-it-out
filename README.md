@@ -28,9 +28,24 @@ Then run
 
 ### Part 1: Basic cache operations
 
+We implement basic cache functionality including
+- `get`: retrieves an existing key from the cache
+- `set`: inserts or modifies existing keys
+- `del` : removes an item from the cache
+- `space_used`: returns the total memory used by all cache values (not keys)
+- `reset`: deletes all data from the cache
+
 
 ### Part 2: Testing
-(list a bunch of tests that we did)
+We test all cache functionality for both when the Evictor is a `nullptr` and when the Evictor is a FIFO Evictor.
+
+We test for the following cases:
+- Insert a key-value pair into the cache when `maxmem` is not exceeded :white_check_mark:
+- Insert a key-value pair into the cache when `maxmem` has been exceeded :white_check_mark:
+- Getting a key-value pair that was inserted from the cache :white_check_mark:
+- Getting a key-value pair that was not inserted from the cache :white_check_mark:
+- Getting a key-value pair that was inserted and modified from the cache :white_check_mark:
+- Getting a key-value pair that was inserted and deleted from the cache :white_check_mark:
 
 ### Part 3: Performance
 We implement [Rolling Hashing](https://en.wikipedia.org/wiki/Rolling_hash#Rabin-Karp_rolling_hash) for string hashing. We implement the algorithm as described here: https://cp-algorithms.com/string/string-hashing.html
