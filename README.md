@@ -18,12 +18,12 @@
 To compile:
 
 ```
-g++ -std=c++17 test_cache_lib.cc
+make
 ```
 Then run
 
 ```
-./a.out
+./test_cache_lib
 ```
 
 ### Part 1: Basic cache operations
