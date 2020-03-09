@@ -28,12 +28,15 @@ Then run
 
 ### Part 1: Basic cache operations
 
-We implement basic cache functionality including
+
+We implemented basic cache functionality including
 - `get`: retrieves an existing key from the cache
 - `set`: inserts or modifies existing keys
 - `del` : removes an item from the cache
 - `space_used`: returns the total memory used by all cache values (not keys)
 - `reset`: deletes all data from the cache
+
+std::unordered_map was used as the underlying hash table, hashing keys to items of type val_type. Care was taken to manage memory. `set` copies memory controlled by the user into a new address controlled by the cache. The memory is freed when the k-v pair is deleted or the value changes. 
 
 
 ### Part 2: Testing
@@ -50,12 +53,18 @@ We test for the following cases:
 - `memused` updates as expected after an insertion that should involve an eviction. :white_check_mark:
 
 ### Part 3: Performance
+As mentioned previously, std::unordered_map is used as the underlying hash table. All operations do indeed run in asymptotic constant time. 
+
 We implement [Rolling Hashing](https://en.wikipedia.org/wiki/Rolling_hash#Rabin-Karp_rolling_hash) for string hashing. We implement the algorithm as described here: https://cp-algorithms.com/string/string-hashing.html
 
+### Part 4/5: Collision resolution & Dynamic Resizing
+We let **C++ standard unordered_map** handle collisions. This was done for a few reasons. First, it meant one less thing to implement, and was sure to be optimized beyond anything we could practically accomplish. Second, its collision handling (collision chaining) is a perfectly acceptable policy for our purposes, especially since we require the ability to change k-v pairs (this takes an unacceptable performance toll with other collision-handling policies like quadratic/linear probing). 
 
-### Part 4: Collision resolution
-We let **C++ standard unordered_map** handle collisions: **rehashes** are automatically performed by the container whenever its **load factor** is going to surpass its **max_load_factor** in an operation. The load factor is defined as *the ratio between the number of elements in the container (its size) and the number of buckets (bucket_count)*. We override the default max_load_factor (1.0) by unordered_map to the custom value 0.75. The container uses the value of max_load_factor as the threshold that forces an increase in the number of buckets (and thus causing a rehash).
+
+
+We also allow std::unordered_map to handle resizing. **rehashes** into a table with more buckets are automatically performed by the container whenever its **load factor** is going to surpass its **max_load_factor** in an operation. The load factor is defined as *the ratio between the number of elements in the container (its size) and the number of buckets (bucket_count)*. We override the default max_load_factor (1.0) by unordered_map to the custom value 0.75. 
+
 
 
 ### Part 5: Eviction policy
-We implemented First-In-First-Out (FIFO) eviction policy using the C++ standard queue.
+We implemented First-In-First-Out (FIFO) eviction policy using std::queue. Touching a key adds a key to the queue, and evicting a key involves popping a key from the queue (the cache implementation then attempts to delete the corresponding k-v pair). 
