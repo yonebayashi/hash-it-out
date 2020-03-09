@@ -12,6 +12,7 @@
 using namespace std;
 
 void testCacheBasic_wo_Evictor() {
+  cout<< endl<<"Beginning test for cache with no evictor..."<<endl;
   Cache cache(0, 0.75, nullptr);
   const Cache::val_type val1 = "1";
   Cache::size_type size;
@@ -111,6 +112,13 @@ void testCacheBasic_w_Evictor() {
   assert(size == 0);
   cout <<"Test passed for querying after deletion" << endl;
 
+  //Testing a reset: 
+
+  cout<<"Reseting the Cache..."<<endl;
+  basic_cache.reset();
+  assert(basic_cache.space_used()== 0);
+  assert(basic_cache.get("k4",size)== NULL);
+  cout<<"Test passed for Reseting the cache."<<endl;
 
 
 
