@@ -51,6 +51,7 @@ We test for the following cases:
 - Getting a key-value pair that was inserted and deleted from the cache :white_check_mark:
 - Attempting to access a k-v pair after it should be evicted in another key's insertion results in a nullptr. :white_check_mark:
 - `memused` updates as expected after an insertion that should involve an eviction. :white_check_mark:
+- Resetting the cache drops  `memused` to 0 and querying previously inserted keys returns a nullptr. :white_check_mark:
 
 ### Part 3: Performance
 As mentioned previously, std::unordered_map is used as the underlying hash table. All operations do indeed run in asymptotic constant time. 
