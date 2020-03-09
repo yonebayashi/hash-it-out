@@ -69,7 +69,23 @@ void testCacheBasic() {
 
   //assert(basic_cache.get("k3", size) == "17");
 
-  cout << "Test get key 1 passed" << endl;
+  cout << "Test passed for retreiving k3 after it's changed." << endl;
+
+
+  //TODO:
+  //Testing eviction after memory overflow AND
+  //querying for both evicted value and newly added value:
+
+  cout<<"Adding k-v pair k5: '5'... "<<endl;
+  basic_cache.set("k5", val5, 3);
+  cout << "Attempting to retrieve key 1 (evicted from cache)... " << endl;
+  assert(basic_cache.get("k1", size) == nullptr);
+  assert(basic_cache.space_used() == 8);
+  cout << "Test passed for evicting item from cache" << endl;
+
+  cout<<"Attempting to retreive k5... "<<  basic_cache.get("k5", size)<<endl;
+  //assert(basic_cache.get("k5", size) == "5");
+  cout<< "Test passed for an insertion that uses eviction. "<<endl;
 
   //TODO: show the memory at old address is now deleted?
 
@@ -84,10 +100,6 @@ void testCacheBasic() {
   assert(basic_cache.get("k4", size) == nullptr);
   cout <<"Test passed for querying after deletion"<<endl;
 
-
-  //TODO:
-  //Testing eviction after memory overflow AND
-  //querying for both evicted value and newly added value:
 
 
 
