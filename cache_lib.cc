@@ -27,7 +27,7 @@ class Cache::Impl {
     hash_func hasher;
     size_type memused;
     std::unordered_map<key_type, val_type, hash_func> m_cache;
-    
+
 
     Impl(size_type maxmem,
         float max_load_factor,
@@ -58,9 +58,6 @@ class Cache::Impl {
         //If the key is already in the cache and we're updating the value,
         //we want to free the memory pointed to by the pointer previously corresponding
         //to key before losing track of its address.
-
-        //TODO: Handle case of evictor=nullptr. Could result in k-v pair being evicted from
-        //cache, and not being replaced.
         del(key);
       }
       if (memused + size >maxmem and evictor==nullptr) {
@@ -85,7 +82,6 @@ class Cache::Impl {
     val_type get(key_type key, size_type& val_size) const {
       auto item = m_cache.find(key);
       if (item == m_cache.end()) {
-        //std::cout << "Item not found" << std::endl;
         val_size = 0;
         return nullptr;
       }
@@ -121,7 +117,7 @@ class Cache::Impl {
       }
       if (evictor!= nullptr) {
         while (evictor-> evict()!= "") {
-          bool dummy = false; //Do I need this here?
+          bool dummy = false;
           dummy +=1;
         }
       }
