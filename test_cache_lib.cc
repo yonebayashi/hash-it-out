@@ -8,8 +8,22 @@
 
 using namespace std;
 
+void testCacheBasic_wo_Evictor() {
+  Cache cache(0, 0.75, nullptr);
+  const Cache::val_type val1 = "1";
+  Cache::size_type size;
+  cout << "Inserting key 1 of size " << strlen(val1)+1 << " bytes" << endl;
+  cache.set("k1", val1, strlen(val1)+1);
+  cout << "Attempting to retrieve key 1 (should not have been inserted)... " << endl;
+  assert(cache.get("k1", size) == NULL);
+  assert(size == 0);
+  cout << "Test passed for no-evictor memory overflow" << endl;
 
-void testCacheBasic() {
+
+
+}
+
+void testCacheBasic_w_Evictor() {
   FifoEvictor* evictor= new FifoEvictor();
   Cache basic_cache(8, 0.75, evictor);
 
@@ -63,7 +77,22 @@ void testCacheBasic() {
   //Show the value changed
   cout << "Retrieving key 3... " << endl;
   assert(strcmp(basic_cache.get("k3", size), val4) == 0);
-  cout << "Test get key 3 passed" << endl;
+  cout << "Test get key after its value has been changed passed" << endl;
+
+  //TODO:
+  //Testing eviction after memory overflow AND
+  //querying for both evicted value and newly added value:
+
+  cout<<"Adding k-v pair k5: '18'... "<<endl;
+  basic_cache.set("k5", val5, 3);
+  cout << "Attempting to retrieve key 1 (evicted from cache)... " << endl;
+  assert(basic_cache.get("k1", size) == nullptr);
+  assert(basic_cache.space_used() == 8);
+  cout << "Test passed for evicting item from cache" << endl;
+
+  cout<<"Attempting to retreive k5... "<<  basic_cache.get("k5", size)<<endl;
+  //assert(basic_cache.get("k5", size) == "5");
+  cout<< "Test passed for an insertion that uses eviction. "<<endl;
 
   //TODO: show the memory at old address is now deleted?
 
@@ -79,10 +108,6 @@ void testCacheBasic() {
   assert(size == 0);
   cout <<"Test passed for querying after deletion" << endl;
 
-  //TODO:
-  //Testing eviction after memory overflow AND
-  //querying for both evicted value and newly added value:
-
 
 
 
@@ -92,6 +117,7 @@ void testCacheBasic() {
 }
 
 int main(int argc, char const *argv[]) {
-  testCacheBasic();
+  testCacheBasic_w_Evictor();
+  testCacheBasic_wo_Evictor();
   return 0;
 }
