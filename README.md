@@ -46,6 +46,8 @@ We test for the following cases:
 - Getting a key-value pair that was not inserted from the cache :white_check_mark:
 - Getting a key-value pair that was inserted and modified from the cache :white_check_mark:
 - Getting a key-value pair that was inserted and deleted from the cache :white_check_mark:
+- Attempting to access a k-v pair after it should be evicted in another key's insertion results in a nullptr. :white_check_mark:
+- `memused` updates as expected after an insertion that should involve an eviction. :white_check_mark:
 
 ### Part 3: Performance
 We implement [Rolling Hashing](https://en.wikipedia.org/wiki/Rolling_hash#Rabin-Karp_rolling_hash) for string hashing. We implement the algorithm as described here: https://cp-algorithms.com/string/string-hashing.html
