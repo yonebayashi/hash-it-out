@@ -75,7 +75,7 @@ void testCacheBasic() {
   //Testing eviction after memory overflow AND
   //querying for both evicted value and newly added value:
 
-  cout<<"Adding k-v pair k5: '5'... "<<endl;
+  cout<<"Adding k-v pair k5: '18'... "<<endl;
   basic_cache.set("k5", val5, 3);
   cout << "Attempting to retrieve key 1 (evicted from cache)... " << endl;
   assert(basic_cache.get("k1", size) == nullptr);
