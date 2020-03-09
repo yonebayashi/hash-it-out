@@ -2,6 +2,7 @@
 
 #include "evictor.hh"
 
+#pragma once
 
 class FifoEvictor : public Evictor {
 private:

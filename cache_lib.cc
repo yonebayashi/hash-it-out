@@ -25,9 +25,9 @@ class Cache::Impl {
     float max_load_factor;
     Evictor* evictor;
     hash_func hasher;
-
-    std::unordered_map<key_type, val_type, hash_func> m_cache;
     size_type memused;
+    std::unordered_map<key_type, val_type, hash_func> m_cache;
+    
 
     Impl(size_type maxmem,
         float max_load_factor,
@@ -122,6 +122,7 @@ class Cache::Impl {
       if (evictor!= nullptr) {
         while (evictor-> evict()!= "") {
           bool dummy = false; //Do I need this here?
+          dummy +=1;
         }
       }
       memused = 0;

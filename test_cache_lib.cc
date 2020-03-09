@@ -1,10 +1,13 @@
 #include <iostream>
 #include <cassert>
 #include <typeinfo>
+#include <cstring>
 
 #include "evictor.hh"
-#include "cache_lib.cc"
-#include "fifo_evictor.cc"
+#include "cache.hh"
+#include "fifo_evictor.hh"
+//#include "cache_lib.cc"
+//#include "fifo_evictor.cc"
 
 using namespace std;
 
@@ -116,7 +119,7 @@ void testCacheBasic_w_Evictor() {
 
 }
 
-int main(int argc, char const *argv[]) {
+int main() {
   testCacheBasic_w_Evictor();
   testCacheBasic_wo_Evictor();
   return 0;
