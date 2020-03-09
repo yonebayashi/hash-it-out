@@ -9,7 +9,7 @@ private:
 
 public:
   FifoEvictor();
-  ~FifoEvictor() = default;
+  ~FifoEvictor();
 
   // Disallow copies
   FifoEvictor(const FifoEvictor&) = delete;

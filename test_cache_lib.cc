@@ -4,6 +4,7 @@
 
 #include "evictor.hh"
 #include "cache_lib.cc"
+#include "fifo_evictor.cc"
 
 using namespace std;
 
