@@ -8,7 +8,6 @@
 
 
 struct default_hash {
-  // Implement Rolling Hash: https://en.wikipedia.org/wiki/Rolling_hash#Rabin-Karp_rolling_hash
   Cache::size_type operator()(key_type const& key) const {
       const Cache::size_type p = 53;
       unsigned long long int result= 0;
@@ -55,18 +54,21 @@ class Cache::Impl {
       if (size>maxmem) {
         return;
       }
+      if (m_cache.find(key)!= m_cache.end() ) {
+        //If the key is already in the cache and we're updating the value,
+        //we want to free the memory pointed to by the pointer previously corresponding
+        //to key before losing track of its address.
+
+        //TODO: Handle case of evictor=nullptr. Could result in k-v pair being evicted from
+        //cache, and not being replaced.
+        del(key);
+      }
       if (memused + size >maxmem and evictor==nullptr) {
         return;
       }
       while (memused + size > maxmem) {
         auto key_to_evict = evictor->evict();
         del(key_to_evict);
-      }
-      if (m_cache.find(key)!= m_cache.end()) {
-        //If the key is already in the cache and we're updating the value,
-        //we want to free the memory pointed to by the pointer previously corresponding
-        //to key before losing track of its address.
-        del(key);
       }
 
       byte_type* new_val = new byte_type[size-1];
@@ -83,6 +85,7 @@ class Cache::Impl {
     val_type get(key_type key, size_type& val_size) const {
       auto item = m_cache.find(key);
       if (item == m_cache.end()) {
+        //std::cout << "Item not found" << std::endl;
         val_size = 0;
         return nullptr;
       }
@@ -101,9 +104,11 @@ class Cache::Impl {
         m_cache.erase(key);
         memused-= size;
         return true;
+      } else {
+        return false;
       }
-      return false;
     };
+
 
 
     size_type space_used() const {
@@ -121,8 +126,9 @@ class Cache::Impl {
       }
       memused = 0;
     };
-};
 
+
+};
 
 Cache::Cache(size_type maxmem,
       float max_load_factor,
