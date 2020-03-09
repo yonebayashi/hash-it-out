@@ -15,7 +15,7 @@ public:
   FifoEvictor(const FifoEvictor&) = delete;
   FifoEvictor& operator=(const FifoEvictor&) = delete;
 
-  void touch_key(const key_type&); 
+  void touch_key(const key_type&);
   const key_type evict();
 
   void clear();
