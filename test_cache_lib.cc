@@ -6,8 +6,7 @@
 #include "evictor.hh"
 #include "cache.hh"
 #include "fifo_evictor.hh"
-//#include "cache_lib.cc"
-//#include "fifo_evictor.cc"
+
 
 using namespace std;
 
@@ -22,9 +21,6 @@ void testCacheBasic_wo_Evictor() {
   assert(cache.get("k1", size) == NULL);
   assert(size == 0);
   cout << "Test passed for no-evictor memory overflow" << endl;
-
-
-
 }
 
 void testCacheBasic_w_Evictor() {
@@ -56,11 +52,10 @@ void testCacheBasic_w_Evictor() {
   assert(basic_cache.space_used() == 7);
   cout << "Test insert 3 items passed" << endl;
 
-  // TODO: Test should stop accepting new values when maxmem is exceeded
-
-  // TODO: Test get function
+  /* Test get function */
   Cache::size_type size;
 
+  // Getting a key that was inserted
   cout << "Retrieving key 1... " << endl;
   assert(strcmp(basic_cache.get("k1", size), val1) == 0);
   cout << "Test get key 1 passed" << endl;
@@ -71,37 +66,29 @@ void testCacheBasic_w_Evictor() {
   assert(size == 0);
   cout << "Test retrieve item not in cache passed" << endl;
 
-  //Change a key already in cache
+  // Getting a key that was inserted and modified
   cout << "Inserting value of size " << strlen(val3)+1 << " bytes at key 3" << endl;
   basic_cache.set("k3", val4, strlen(val4)+1);
-  cout<<"Space used is: "<<basic_cache.space_used()<<endl;
+  cout<< "Space used is: " << basic_cache.space_used() <<endl;
   assert(basic_cache.space_used() == 7);
-  cout <<"Test for changing an existing k-v pair passed"<<endl;
 
-  //Show the value changed
   cout << "Retrieving key 3... " << endl;
   assert(strcmp(basic_cache.get("k3", size), val4) == 0);
   cout << "Test get key after its value has been changed passed" << endl;
 
-  //TODO:
   //Testing eviction after memory overflow AND
   //querying for both evicted value and newly added value:
 
-  cout<<"Adding k-v pair k5: '18'... "<<endl;
-  basic_cache.set("k5", val5, 3);
+  cout<<"Adding k-v pair key 5..." <<endl;
+  basic_cache.set("k5", val5, strlen(val5)+1);
   cout << "Attempting to retrieve key 1 (evicted from cache)... " << endl;
   assert(basic_cache.get("k1", size) == nullptr);
   assert(basic_cache.space_used() == 8);
   cout << "Test passed for evicting item from cache" << endl;
 
-  cout<<"Attempting to retreive k5... "<<  basic_cache.get("k5", size)<<endl;
-  //assert(basic_cache.get("k5", size) == "5");
+  cout<<"Attempting to retrieve key 5... " <<endl;
+  assert(strcmp(basic_cache.get("k5", size), val5) == 0);
   cout<< "Test passed for an insertion that uses eviction. "<<endl;
-
-  //TODO: show the memory at old address is now deleted?
-
-  // Does this do it? cout<< "Viewing memory at val4... "<< '"'<<val4<<'"'<<endl;
-  // Corresponding assertion? : assert(val4=="");
 
 
   //Testing Deletion, and querying after deletion:
@@ -112,19 +99,12 @@ void testCacheBasic_w_Evictor() {
   assert(size == 0);
   cout <<"Test passed for querying after deletion" << endl;
 
-  //Testing a reset: 
-
+  // Testing reset function
   cout<<"Reseting the Cache..."<<endl;
   basic_cache.reset();
   assert(basic_cache.space_used()== 0);
   assert(basic_cache.get("k4",size)== NULL);
-  cout<<"Test passed for Reseting the cache."<<endl;
-
-
-
-
-
-
+  cout<<"Test passed for reseting the cache."<<endl;
 }
 
 int main() {
