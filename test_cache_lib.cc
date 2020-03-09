@@ -38,18 +38,15 @@ void testCacheBasic() {
   assert(basic_cache.space_used() == 7);
   cout << "Test insert 3 items passed" << endl;
 
-  // TODO: Test should evict the first item to make space for the new one
-
   // TODO: Test should stop accepting new values when maxmem is exceeded
 
   // TODO: Test get function
   Cache::size_type size;
 
-  // cout << "Retrieving key 1... " << basic_cache.get("k1", size) << endl;
+  cout << "Retrieving key 1... " << endl;
+  assert(strcmp(basic_cache.get("k1", size), val1) == 0);
+  cout << "Test get key 1 passed" << endl;
 
-  // assert(basic_cache.get("k1", size) == "1");
-
-  // cout << "Test get key 1 passed" << endl;
 
   cout << "Attempting to retrieve key 4 (not yet in cache)... " << endl;
   assert(basic_cache.get("k4", size) == NULL);
@@ -57,18 +54,16 @@ void testCacheBasic() {
   cout << "Test retrieve item not in cache passed" << endl;
 
   //Change a key already in cache
-  cout << "Inserting val4  of size " << strlen(val3)+1 << " bytes at key 3" << endl;
+  cout << "Inserting value of size " << strlen(val3)+1 << " bytes at key 3" << endl;
   basic_cache.set("k3", val4, strlen(val4)+1);
   cout<<"Space used is: "<<basic_cache.space_used()<<endl;
   assert(basic_cache.space_used() == 7);
   cout <<"Test for changing an existing k-v pair passed"<<endl;
 
   //Show the value changed
-  cout << "Retrieving key 3... " << basic_cache.get("k3", size) << endl;
-
-  //assert(basic_cache.get("k3", size) == "17");
-
-  cout << "Test get key 1 passed" << endl;
+  cout << "Retrieving key 3... " << endl;
+  assert(strcmp(basic_cache.get("k3", size), val4) == 0);
+  cout << "Test get key 3 passed" << endl;
 
   //TODO: show the memory at old address is now deleted?
 
