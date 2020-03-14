@@ -90,9 +90,13 @@ TEST_CASE ("Cache with nullptr Evictor", "[cache]") {
     REQUIRE(cache.space_used() == 0);
   }
 
-  // SECTION( "should delete a key" ) {
-  //
-  // }
+  SECTION( "resetting should return empty cache" ) {
+    cache.set("k1", val1, strlen(val1)+1);
+    cache.set("k2", val2, strlen(val2)+1);
+
+    cache.reset();
+    REQUIRE(cache.space_used() == 0);
+  }
 }
 
 // void testCacheBasic_wo_Evictor() {
